@@ -1,4 +1,5 @@
 # MD5 Hash Library for C++
+[![BuldStatus](https://travis-ci.org/gofer/libmd5.svg?branch=master)](https://travis-ci.org/gofer/libmd5)
 
 ## What's this
 This is MD5 hash library for C++.
