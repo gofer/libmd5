@@ -1,0 +1,28 @@
+include Makefile.in
+
+OBJDIR = src/.build-shared
+TARGET = $(SHARED_TARGET)
+
+CXXFLAGS += -shared -fPIC
+
+.PHONY: all test clean distclean
+
+all: $(TARGET)
+
+$(TARGET): $(OBJS)
+	$(CXX) $(CXXFLAGS) -o $@ $(addprefix $(OBJDIR)/,$(notdir $^))
+
+.cpp.o:
+	if [ ! -d $(OBJDIR) ]; then mkdir -p $(OBJDIR); fi
+	$(CXX) $(CXXFLAGS) -o $(OBJDIR)/$(notdir $@) -c $<
+
+test: $(TARGET)
+	cd test; make test-shared
+
+clean:
+	cd test && make clean && cd ..
+	rm -rf $(OBJDIR)
+
+distclean:
+	cd test && make distclean && cd ..
+	make clean && rm -f $(TARGET)

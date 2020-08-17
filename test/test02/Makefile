@@ -1,28 +1,45 @@
-TARGET = test.out
-SRCS = test.cpp
-OBJS = $(addsuffix .o,$(basename $(SRCS)))
+STATIC_TARGET = test.static.out
+SHARED_TARGET = test.shared.out
+TARGET = $(STATIC_TARGET) $(SHARED_TARGET)
 
-CXXFLAGS = -std=c++11 -Wall -O0 -I../../include $(shell pkg-config --cflags gtest gtest_main)
-LDFLAGS = -L../../lib $(shell pkg-config --libs gtest gtest_main)
+SRCS=test.cpp
+OBJS=$(addsuffix .o,$(basename $(SRCS)))
 
-LIBS = -lmd5 
+LD = g++
+LDFLAGS += -L../../lib $(shell pkg-config --libs gtest gtest_main)
+CXXFLAGS += -std=c++11 -I../../include $(shell pkg-config --cflags gtest gtest_main)
+LIBS=-lmd5
 
-.SUFFIXES:  .c .cc .cpp .h. .hpp
-.PHONY: all check clean distclean
+.SUFFIXES: .cpp .hpp
+.PHONY: all test clean distclean
 
 all: $(TARGET)
 
-$(TARGET): $(OBJS)
-	$(CXX) $(LDFLAGS) -o $@ $^ $(LIBS)
+static: $(STATIC_TARGET)
+
+shared: $(SHARED_TARGET)
+
+$(STATIC_TARGET): $(OBJS)
+	$(LD) $(LDFLAGS) -o $@ $^ ../../lib/libmd5.a
+
+$(SHARED_TARGET): $(OBJS)
+	$(LD) $(LDFLAGS) -o $@ $^ $(LIBS)
 
 .cpp.o:
-	$(CXX) $(CXXFLAGS) -o $@ -c $< 
+	$(CXX) $(CXXFLAGS) -o $@ -c $<
 
-check: $(TARGET)
-	@GTEST_COLOR=1 ./$(TARGET)
+test: $(TARGET)
+	make test-static
+	make test-shared
+
+test-static: $(STATIC_TARGET)
+	GTEST_COLOR=1 ./test.static.out
+
+test-shared: $(SHARED_TARGET)
+	LD_LIBRARY_PATH=../../lib:${LD_LIBRARY_PATH} GTEST_COLOR=1 ./test.shared.out
 
 clean:
 	rm -f *.o
 
 distclean:
-	make clean && rm -f $(TARGET) 
+	make clean && rm -f $(TARGET)

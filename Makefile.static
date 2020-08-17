@@ -1,0 +1,29 @@
+include Makefile.in
+
+OBJDIR = src/.build-static
+TARGET = $(STATIC_TARGET)
+
+CXXFLAGS += -static
+ARFLAGS = rsv
+
+.PHONY: all test clean distclean
+
+all: $(TARGET)
+
+$(TARGET): $(OBJS)
+	$(AR) $(ARFLAGS) -o $@ $(addprefix $(OBJDIR)/,$(notdir $^))
+
+.cpp.o:
+	if [ ! -d $(OBJDIR) ]; then mkdir -p $(OBJDIR); fi
+	$(CXX) $(CXXFLAGS) -o $(OBJDIR)/$(notdir $@) -c $<
+
+test: $(TARGET)
+	cd test; make test-static
+
+clean:
+	cd test && make clean && cd ..
+	rm -rf $(OBJDIR)
+
+distclean:
+	cd test && make distclean && cd ..
+	make clean && rm -f $(TARGET)

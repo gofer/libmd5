@@ -1,49 +1,40 @@
-SOURCE_DIR  = src
-INCLUDE_DIR = include
-LIBRARY_DIR = lib
+include Makefile.in
 
-TEST_DIR    = test
-TOOL_DIR    = tools
+TARGET = $(TARGET_STATIC) $(TARGET_SHARED)
 
-CXX      = g++
-CXXFLAGS = -std=c++11 -Wall -O3 -I$(INCLUDE_DIR)
-AR       = ar
-ARFLAGS  = rsv
+.PHONY: all test clean distclean
 
-TARGET = $(LIBRARY_DIR)/libmd5.a
-SRCS   = $(SOURCE_DIR)/utils.cpp $(SOURCE_DIR)/md5.cpp $(SOURCE_DIR)/md5_ptr.cpp
-OBJS   = $(subst .cpp,.o,$(SRCS))
+all:
+	make shared
+	make static
 
-t=$(shell find . -name lib | wc -c)
+static: $(STATIC_TARGET)
 
-$(TARGET): $(OBJS)
-ifeq ($t,0)
-		mkdir $(LIBRARY_DIR)
-endif
-	$(AR) $(ARFLAGS) $@ $^
+shared: $(SHARED_TARGET)
 
-.SUFFIXES:	.cc .cpp
-.cpp.o:
-	$(CXX) $(CXXFLAGS) -o $@ -c $<
-.cc.o:
-	$(CXX) $(CXXFLAGS) -o $@ -c $<
+$(STATIC_TARGET):
+	@if [ ! -d lib ]; then mkdir -p lib; fi
+	make -f Makefile.static
 
-.PHONY: check
-check: $(TARGET)
-	cd ${TEST_DIR} && make && make check
+$(SHARED_TARGET):
+	@if [ ! -d lib ]; then mkdir -p lib; fi
+	make -f Makefile.shared
 
-.PHONY: tools
-tools: $(TARGET)
-	cd ${TOOL_DIR} && make
+test: $(TARGET)
+	make test-static
+	make test-shared
 
-.PHONY: clean
-clean: 
-	rm -f $(SOURCE_DIR)/*.o
+test-static: $(STATIC_TARGET)
+	make -f Makefile.static test
 
-.PHONY: distclean
+test-shared: $(SHARED_TARGET)
+	make -f Makefile.shared test
+
+clean:
+	make -f Makefile.static clean
+	make -f Makefile.shared clean
+
 distclean:
-	make clean && rm -f $(TARGET)
-ifneq ($t,0)
-	  rmdir $(LIBRARY_DIR)
-endif
-	cd ${TEST_DIR} && make distclean
+	make -f Makefile.static distclean
+	make -f Makefile.shared distclean
+	rm -rf lib

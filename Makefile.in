@@ -1,0 +1,9 @@
+STATIC_TARGET = lib/libmd5.a
+SHARED_TARGET = lib/libmd5.so
+
+SRCS = src/utils.cpp src/md5.cpp src/md5_ptr.cpp
+OBJS = $(addsuffix .o,$(basename $(SRCS)))
+
+CXXFLAGS += -std=c++11 -Iinclude
+
+.SUFFIXES: .cpp .hpp
