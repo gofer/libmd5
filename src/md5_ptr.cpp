@@ -89,12 +89,11 @@ int hash(const std::string* _src, Hash* hash) {
 }
 
 int to_string(const Hash* hash, std::string* dst) {	
-	char buf[16];
+	char buf[33];
 	::sprintf(buf, "%08x%08x%08x%08x", 
 		(*hash)[0].i, (*hash)[1].i, (*hash)[2].i, (*hash)[3].i
 	);
 	dst->assign(buf);
-	
 	return 0;
 }
 };

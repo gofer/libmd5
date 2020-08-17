@@ -6,7 +6,7 @@ TEST_DIR    = test
 TOOL_DIR    = tools
 
 CXX      = g++
-CXXFLAGS = -std=c++1y -Wall -O3 -I$(INCLUDE_DIR)
+CXXFLAGS = -std=c++11 -Wall -O3 -I$(INCLUDE_DIR)
 AR       = ar
 ARFLAGS  = rsv
 
@@ -37,14 +37,13 @@ tools: $(TARGET)
 	cd ${TOOL_DIR} && make
 
 .PHONY: clean
-clean: $(OBJS)
+clean: 
 	rm -f $(SOURCE_DIR)/*.o
 
 .PHONY: distclean
-distclean: $(TARGET)
+distclean:
 	make clean && rm -f $(TARGET)
 ifneq ($t,0)
-	rmdir $(LIBRARY_DIR)
+	  rmdir $(LIBRARY_DIR)
 endif
-	cd ${TEST_DIR} && make distclean
 	cd ${TEST_DIR} && make distclean

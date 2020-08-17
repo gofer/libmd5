@@ -1,35 +1,15 @@
-SRC_DIR=src
+TEST_DIRS = test01 test02 test03 test04
 
-CXX      = g++
-CXXFLAGS = -std=c++1y -Wall -O3 -I../include
-LD       = g++
-LDFLAGS  = -L../lib
+.PHONY: all check clean distclean
 
-TARGET1 = test01.exe
-TARGET2 = test02.exe
-SRCS   = $(SRC_DIR)/test01.cpp $(SRC_DIR)/test02.cpp
-OBJS   = $(subst .cpp,.o,$(SRCS))
+all:
+	@for dir in $(TEST_DIRS); do cd $${dir}; make; ret=$$?; if [ $${ret} -ne 0 ]; then exit $${ret}; fi; cd ..; done
 
-all: $(TARGET1) $(TARGET2)
+check:
+	@for dir in $(TEST_DIRS); do cd $${dir}; make check; ret=$$?; if [ $${ret} -ne 0 ]; then exit $${ret}; fi; cd ..; done
 
-$(TARGET1): $(OBJS)
-	$(LD) $(LDFLAGS) -o $@ $< -lmd5
+clean:
+	@for dir in $(TEST_DIRS); do cd $${dir}; makei clean; cd ..; done
 
-$(TARGET2): $(OBJS)
-	$(LD) $(LDFLAGS) -o $@ $< -lmd5
-
-.SUFFIXES:	.cc .cpp
-.cpp.o:
-	$(CXX) $(CXXFLAGS) -o $@ -c $<
-
-.PHONY: check
-check: $(TARGET)
-	@./check
-
-.PHONY: clean
-clean: $(OBJS)
-	rm -f *.o
-
-.PHONY: distclean
-distclean: $(TARGET1) $(TARGET2)
-	make clean && rm -f {$(TARGET1),$(TARGET2)} 
+distclean:
+	@for dir in $(TEST_DIRS); do cd $${dir}; make distclean; cd ..; done

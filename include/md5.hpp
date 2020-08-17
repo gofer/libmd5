@@ -9,12 +9,12 @@ namespace MD5 {
 
 	union _UINT64_T {
 		uint64_t i;
-		unsigned char s[64/BITS_PER_BYTE];
+		unsigned char s[64 / BITS_PER_BYTE];
 	};
 
 	union _UINT32_T {
 		uint32_t i;
-		unsigned char s[32/BITS_PER_BYTE];
+		unsigned char s[32 / BITS_PER_BYTE];
 	};
 	
 	typedef std::array<_UINT32_T, 4> Hash;
