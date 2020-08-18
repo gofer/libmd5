@@ -11,7 +11,7 @@ int main(int argc, char** argv) {
 	
 	dst = MD5::to_string( MD5::hash(src) );
 	
-	std::cout << dst;
+	std::cout << dst << std::endl;
 	
 	return 0;
 }
